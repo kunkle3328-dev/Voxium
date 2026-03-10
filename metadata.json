@@ -1,0 +1,5 @@
+{
+  "name": "Voxium",
+  "description": "A sophisticated voice-first AI research and knowledge application.",
+  "requestFramePermissions": ["microphone"]
+}
