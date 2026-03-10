@@ -1,10 +1,10 @@
-export type AppMode =
-  | "explore"
-  | "research"
-  | "debate"
-  | "tutor"
-  | "analyst"
-  | "briefing"
+export type AppMode = 
+  | "explore" 
+  | "research" 
+  | "debate" 
+  | "tutor" 
+  | "analyst" 
+  | "briefing" 
   | "deep_dive";
 
 export interface ModeConfig {
@@ -14,7 +14,7 @@ export interface ModeConfig {
   icon: string;
 }
 
-export type VoiceState = "idle" | "listening" | "thinking" | "speaking";
+export type VoiceState = "idle" | "listening" | "processing" | "speaking" | "interrupted" | "stopped" | "error";
 
 export interface Message {
   id: string;
@@ -23,7 +23,7 @@ export interface Message {
   timestamp: Date;
   sources?: Citation[];
   isStreaming?: boolean;
-  expertName?: string;
+  isLoading?: boolean;
 }
 
 export interface Citation {

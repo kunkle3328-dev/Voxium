@@ -1,136 +1,89 @@
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { VoiceState } from "../types";
 import { cn } from "../utils/cn";
 
 interface VoiceOrbProps {
   state: VoiceState;
   className?: string;
-  onClick?: () => void;
 }
 
-export function VoiceOrb({ state, className, onClick }: VoiceOrbProps) {
-  return (
-    <div
-      className={cn(
-        "relative flex items-center justify-center cursor-pointer group",
-        className,
-      )}
-      onClick={onClick}
-    >
-      {/* Immersive Atmosphere */}
-      <AnimatePresence>
-        {state !== "idle" && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.6 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-[-50%] rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.15)_0%,transparent_70%)] blur-3xl pointer-events-none"
-          />
-        )}
-      </AnimatePresence>
+export function VoiceOrb({ state, className }: VoiceOrbProps) {
+  const getOrbColor = () => {
+    switch (state) {
+      case "listening":
+        return "from-rose-500 via-rose-400 to-rose-600";
+      case "processing":
+        return "from-accent-violet via-accent-blue to-accent-cyan";
+      case "speaking":
+        return "from-emerald-500 via-emerald-400 to-emerald-600";
+      case "interrupted":
+        return "from-amber-500 via-orange-400 to-red-600";
+      case "error":
+        return "from-red-700 via-red-600 to-red-800";
+      default:
+        return "from-accent-gold via-yellow-500 to-orange-500";
+    }
+  };
 
-      {/* Layered Glows */}
+  return (
+    <div className={cn("relative flex items-center justify-center", className)}>
+      {/* Background Glow */}
       <motion.div
-        className="absolute inset-0 rounded-full bg-accent-violet/20 blur-2xl"
         animate={{
-          scale: state === "speaking" ? [1, 1.2, 1] : [1, 1.05, 1],
+          scale: state === "listening" ? [1, 1.2, 1] : state === "speaking" ? [1, 1.1, 1] : 1,
           opacity: state === "idle" ? 0.3 : 0.6,
         }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-      />
-      
-      <motion.div
-        className="absolute inset-0 rounded-full bg-accent-cyan/10 blur-3xl"
-        animate={{
-          scale: state === "listening" ? [1, 1.3, 1] : [1, 1.1, 1],
-          opacity: state === "listening" ? 0.5 : 0.2,
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut",
         }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-      />
-
-      {/* Outer Ring */}
-      <motion.div
-        className="absolute inset-0 rounded-full border border-white/10"
-        animate={{
-          rotate: 360,
-          scale: state === "thinking" ? 1.05 : 1,
-        }}
-        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-      />
-
-      {/* Pulsing Rings */}
-      <AnimatePresence>
-        {state === "listening" && (
-          <>
-            {[1, 2, 3].map((i) => (
-              <motion.div
-                key={i}
-                className="absolute inset-0 rounded-full border border-accent-cyan/30"
-                initial={{ scale: 1, opacity: 0.5 }}
-                animate={{ scale: 1.5 + i * 0.2, opacity: 0 }}
-                transition={{ duration: 2, repeat: Infinity, delay: i * 0.4, ease: "easeOut" }}
-              />
-            ))}
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* The Core */}
-      <motion.div
         className={cn(
-          "relative z-10 rounded-full shadow-2xl overflow-hidden",
-          "bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20",
+          "absolute inset-0 rounded-full blur-3xl bg-gradient-to-tr",
+          getOrbColor()
         )}
-        style={{ width: "70%", height: "70%" }}
-        animate={{
-          scale: state === "speaking" ? [1, 1.05, 0.98, 1.02, 1] : 1,
-        }}
-        transition={{ duration: 0.5, repeat: state === "speaking" ? Infinity : 0 }}
-      >
-        {/* Internal Fluid Effect */}
-        <motion.div
-          className={cn(
-            "absolute inset-0 opacity-40 bg-gradient-to-tr",
-            state === "listening" ? "from-accent-cyan via-blue-500 to-transparent" :
-            state === "speaking" ? "from-accent-violet via-fuchsia-500 to-transparent" :
-            state === "thinking" ? "from-accent-gold via-orange-500 to-transparent" :
-            "from-white/10 to-transparent"
-          )}
-          animate={{
-            rotate: [0, 360],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-        />
+      />
 
-        {/* Core Light */}
-        <motion.div
-          className={cn(
-            "absolute inset-[20%] rounded-full blur-md opacity-80",
-            state === "listening" ? "bg-accent-cyan" :
-            state === "speaking" ? "bg-accent-violet" :
-            state === "thinking" ? "bg-accent-gold" :
-            "bg-white/20"
-          )}
-          animate={{
-            scale: state === "idle" ? [1, 1.1, 1] : [1, 1.3, 0.9, 1.1, 1],
-          }}
-          transition={{ duration: state === "idle" ? 4 : 1, repeat: Infinity }}
-        />
-
-        {/* Surface Shine */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/30 pointer-events-none" />
-      </motion.div>
-
-      {/* Status Label */}
+      {/* Main Orb */}
       <motion.div
-        className="absolute -bottom-12 left-1/2 -translate-x-1/2"
-        animate={{ opacity: state === "idle" ? 0.4 : 1 }}
+        animate={{
+          scale: state === "listening" ? [1, 1.1, 1] : state === "processing" ? [1, 0.9, 1] : 1,
+          rotate: state === "processing" ? 360 : 0,
+        }}
+        transition={{
+          duration: state === "processing" ? 3 : 2,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className={cn(
+          "w-full h-full rounded-full bg-gradient-to-tr shadow-2xl relative z-10",
+          getOrbColor(),
+          "shadow-[inset_0_2px_10px_rgba(255,255,255,0.3),0_0_40px_rgba(0,0,0,0.5)]"
+        )}
       >
-        <span className="text-[10px] uppercase tracking-[0.5em] font-bold text-white/60">
-          {state === "idle" ? "Standby" : state}
-        </span>
+        {/* Inner Highlight */}
+        <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 bg-white/20 rounded-full blur-md" />
       </motion.div>
+
+      {/* Pulse Rings */}
+      {state === "listening" && (
+        <>
+          {[1, 2, 3].map((i) => (
+            <motion.div
+              key={i}
+              initial={{ scale: 1, opacity: 0.5 }}
+              animate={{ scale: 2.5, opacity: 0 }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                delay: i * 0.6,
+                ease: "easeOut",
+              }}
+              className="absolute inset-0 rounded-full border border-rose-500/30"
+            />
+          ))}
+        </>
+      )}
     </div>
   );
 }
